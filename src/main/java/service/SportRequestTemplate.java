@@ -12,56 +12,87 @@ import java.util.List;
 
 public class SportRequestTemplate {
 
+    public <T> List<T> fetchListFromApi(String stringUrl, Class<T> clazz) {
+        HttpURLConnection connection = null;
+        BufferedReader reader = null;
 
-    public <T> List<T> GetOListOfObjectsByUrl(String stringUrl, Class<T> clazz) throws IOException {
-        // URL для GET-запроса
-        URL url = new URL(stringUrl);
-        HttpURLConnection connection;
-        connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
+        try {
+            URL url = new URL(stringUrl);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
 
-        // Получение ответа
-        int responseCode = connection.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String inputLine;
+            int responseCode = connection.getResponseCode();
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                System.err.println("HTTP request failed with response code: " + responseCode);
+                return new ArrayList<>();
+            }
+
+            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             StringBuilder response = new StringBuilder();
+            String inputLine;
 
-            while ((inputLine = in.readLine()) != null) {
+            while ((inputLine = reader.readLine()) != null) {
                 response.append(inputLine);
             }
-            in.close();
 
-            // Взял все данные с API и замэпил в лист
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.readValue(response.toString(), objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
-        } else
+
+        } catch (Exception e) {
+            System.err.println("Error fetching data from API: " + e.getMessage());
             return new ArrayList<>();
+        } finally {
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+            } catch (IOException e) {
+                System.err.println("Error closing reader: " + e.getMessage());
+            }
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
     }
+    public <T> T fetchFromApi(String stringUrl, Class<T> clazz) {
+        HttpURLConnection connection = null;
+        BufferedReader reader = null;
 
-    public <T> T GetOfObjectByUrl(String stringUrl, Class<T> clazz) throws IOException {
-        // URL для GET-запроса
-        URL url = new URL(stringUrl);
-        HttpURLConnection connection;
-        connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
+        try {
+            URL url = new URL(stringUrl);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
 
-        // Получение ответа
-        int responseCode = connection.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String inputLine;
+            int responseCode = connection.getResponseCode();
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                System.err.println("HTTP request failed with response code: " + responseCode);
+                return null;
+            }
+
+            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             StringBuilder response = new StringBuilder();
+            String inputLine;
 
-            while ((inputLine = in.readLine()) != null) {
+            while ((inputLine = reader.readLine()) != null) {
                 response.append(inputLine);
             }
-            in.close();
 
-            // Взял все данные с API и замэпил в лист
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(response.toString(), clazz);
-        } else
+            return new ObjectMapper().readValue(response.toString(), clazz);
+
+        } catch (Exception e) {
+            System.err.println("Error fetching data from API: " + e.getMessage());
             return null;
+        } finally {
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+            } catch (IOException e) {
+                System.err.println("Error closing reader: " + e.getMessage());
+            }
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
     }
 }

@@ -1,6 +1,6 @@
 package model.match;
 
-class Region {
+public class Region {
     private long id;
     private String name;
     private String nameDefault;
