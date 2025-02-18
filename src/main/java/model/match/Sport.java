@@ -3,7 +3,7 @@ package model.match;
 
 import java.util.List;
 
-class Sport {
+public class Sport {
     private long id;
     private String name;
     private int weight;

@@ -1,9 +1,11 @@
 package model.match;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Match {
     private long id;
     private String name;
@@ -19,6 +21,7 @@ public class Match {
     @JsonProperty("native")
     private boolean nativeGame;
     private String widgetType;
+    private String widgetId;
     private boolean widgetVirtual;
     private String url;
     private String matchPhase;
@@ -43,6 +46,14 @@ public class Match {
 
     public boolean isHasMarketWithZeroMargin() {
         return hasMarketWithZeroMargin;
+    }
+
+    public String getWidgetId() {
+        return widgetId;
+    }
+
+    public void setWidgetId(String widgetId) {
+        this.widgetId = widgetId;
     }
 
     public void setHasMarketWithZeroMargin(boolean hasMarketWithZeroMargin) {

@@ -1,5 +1,8 @@
 package model.match;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 class Specifiers {
     private String total;
     private String hcp;

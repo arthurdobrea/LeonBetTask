@@ -16,14 +16,14 @@ public class GetDataService {
     private SportRequestTemplate sportRequestTemplate = new SportRequestTemplate();
 
     public List<Region> FindDesiredSportEvent(TypeOfSport typeOfSport) throws IOException {
-        List<Sport> sports = sportRequestTemplate.GetOListOfObjectsByUrl(getAllSports, Sport.class);
+        List<Sport> sports = sportRequestTemplate.fetchListFromApi(getAllSports, Sport.class);
 
         return sports.stream()
-                .filter(sport -> sport.getName().toLowerCase().equals(typeOfSport.toString().toLowerCase()))
-                .flatMap(sport -> sport.getRegions().stream()) // Разворачиваем регионы
+                .filter(sport -> sport.getName().equals(typeOfSport.getSportName()))
+                .flatMap(sport -> sport.getRegions().stream())
                 .filter(region -> region.getLeagues().stream()
-                        .anyMatch(league -> league.getTopOrder() == 1 || league.getTopOrder() == 2)) // Оставляем регионы с нужными лигами
-                .limit(2)
+                        .anyMatch(league -> league.getTopOrder() == 1 || league.getTopOrder() == 2 || league.isTop()))
+                .limit(1)
                 .collect(Collectors.toList());
     }
 
@@ -31,23 +31,23 @@ public class GetDataService {
         //нашел первые 2 лиги
         result.forEach(region ->
                 region.setLeagues(region.getLeagues().stream()
-                        .filter(league -> league.getTopOrder() == 1 || league.getTopOrder() == 2) // Оставляем только нужные лиги
+                        .filter(league -> league.getTopOrder() == 1 || league.getTopOrder() == 2 || league.isTop())
+                        .limit(1)
                         .collect(Collectors.toList()))
         );
     }
     public List<Long> ListOfMatches(List<Region> result){
-        // сделал ссылки на матчи на каждую лигу
         return result.stream()
                 .flatMap(region -> region.getLeagues().stream()
-                        .map(league -> league.getId())) // Собираем строку
+                        .map(league -> league.getId()))
                 .collect(Collectors.toList());
     }
 
-    public RootGameMatch FindAllMatchesToSpecificLeague(String Url) throws IOException {
-        return sportRequestTemplate.GetOfObjectByUrl(Url, RootGameMatch.class);
+    public RootGameMatch FindAllMatchesToSpecificLeague(String Url){
+        return sportRequestTemplate.fetchFromApi(Url, RootGameMatch.class);
     }
 
-    public Match FindDesiredMatch(String Url) throws IOException {
-        return sportRequestTemplate.GetOfObjectByUrl(Url, Match.class);
+    public Match FindDesiredMatch(String Url){
+        return sportRequestTemplate.fetchFromApi(Url, Match.class);
     }
 }
