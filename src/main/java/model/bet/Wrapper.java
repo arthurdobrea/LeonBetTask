@@ -5,7 +5,6 @@ import java.util.List;
 public class Wrapper {
     private List<Sport> sports;
 
-    // Геттеры и сеттеры
     public List<Sport> getSports() {
         return sports;
     }

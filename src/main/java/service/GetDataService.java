@@ -15,7 +15,7 @@ import static util.UrlUtil.getAllSports;
 public class GetDataService {
     private SportRequestTemplate sportRequestTemplate = new SportRequestTemplate();
 
-    public List<Region> FindDesiredSportEvent(TypeOfSport typeOfSport) throws IOException {
+    public List<Region> FindDesiredSportEvent(TypeOfSport typeOfSport){
         List<Sport> sports = sportRequestTemplate.fetchListFromApi(getAllSports, Sport.class);
 
         return sports.stream()
@@ -28,7 +28,6 @@ public class GetDataService {
     }
 
     public void ExcludeOtherLeaguesBesideTopTwo(List<Region> result){
-        //нашел первые 2 лиги
         result.forEach(region ->
                 region.setLeagues(region.getLeagues().stream()
                         .filter(league -> league.getTopOrder() == 1 || league.getTopOrder() == 2 || league.isTop())

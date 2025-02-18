@@ -16,7 +16,6 @@ public class League {
     private String logoUrl;
     private Object background;
 
-    // Getters and Setters
     public long getId() {
         return id;
     }

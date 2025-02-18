@@ -11,7 +11,6 @@ public class Region {
     private String url;
     private List<League> leagues;
 
-    // Getters and Setters
     public long getId() {
         return id;
     }

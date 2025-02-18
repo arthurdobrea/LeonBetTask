@@ -9,7 +9,6 @@ public class Sport {
     private String family;
     private List<Region> regions;
 
-    // Getters and Setters
     public long getId() {
         return id;
     }
