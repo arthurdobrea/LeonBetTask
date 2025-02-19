@@ -6,7 +6,6 @@ import model.match.Match;
 import model.match.RootGameMatch;
 import util.TypeOfSport;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,15 +21,15 @@ public class GetDataService {
                 .filter(sport -> sport.getName().equals(typeOfSport.getSportName()))
                 .flatMap(sport -> sport.getRegions().stream())
                 .filter(region -> region.getLeagues().stream()
-                        .anyMatch(league -> league.getTopOrder() == 1 || league.getTopOrder() == 2 || league.isTop()))
+                        .anyMatch(league -> league.isTop() && (league.getTopOrder() == 0)))
                 .limit(1)
                 .collect(Collectors.toList());
     }
 
-    public void ExcludeOtherLeaguesBesideTopTwo(List<Region> result){
+    public void ExcludeOtherLeaguesBesideTopOne(List<Region> result){
         result.forEach(region ->
                 region.setLeagues(region.getLeagues().stream()
-                        .filter(league -> league.getTopOrder() == 1 || league.getTopOrder() == 2 || league.isTop())
+                        .filter(league -> league.isTop() && (league.getTopOrder() == 0))
                         .limit(1)
                         .collect(Collectors.toList()))
         );

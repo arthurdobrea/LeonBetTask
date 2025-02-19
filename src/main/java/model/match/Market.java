@@ -112,12 +112,10 @@ public class Market {
         this.selectionTypes = selectionTypes;
     }
 
-    public void GetFormatedTable(){
-        System.out.println(name);
+    public void getFormatedTable(){
         for (int i = 0; i < runners.size(); i++) {
             System.out.println(runners.get(i).getName() + " " + runners.get(i).getPriceStr() + " " + runners.get(i).getId());
         }
-        System.out.println();
     }
 }
 

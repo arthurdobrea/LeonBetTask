@@ -11,6 +11,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -24,7 +25,7 @@ public class Main {
 
 
     public static void main(String[] args) {
-        ExecutorService executorService = Executors.newFixedThreadPool(3);
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
 
         List<TypeOfSport> sports = Arrays.asList(TypeOfSport.values());
 
@@ -47,11 +48,11 @@ public class Main {
 
         List<Region> result = getDataService.FindDesiredSportEvent(typeOfSport);
 
-        getDataService.ExcludeOtherLeaguesBesideTopTwo(result);
+        getDataService.ExcludeOtherLeaguesBesideTopOne(result);
 
-        List<Long> matchUrls = getDataService.ListOfMatches(result);
+        List<Long> matchId = getDataService.ListOfMatches(result);
 
-        List<String> matchLinks = matchUrls.stream()
+        List<String> matchLinks = matchId.stream()
                 .map(match -> String.format(leagueUrl, match))
                 .collect(Collectors.toList());
 
@@ -66,17 +67,34 @@ public class Main {
 
             matchUrl.forEach(url -> {
                 Match match = getDataService.FindDesiredMatch(url);
-                PrintAllInformation(match);
+                printAllInformation(match);
             });
         });
     }
 
-    private static void PrintAllInformation(Match match) {
-        System.out.println(match.getLeague().getSport().getName() + "," + match.getLeague().getRegion().getName() + " " + match.getLeague().getName());
-        System.out.print(match.getName() + " ");
-        System.out.println(convertToUTC(match.getKickoff()));
-        System.out.println(match.getId());
-        match.getMarkets().forEach(Market::GetFormatedTable);
+    private static void printAllInformation(Match match) {
+        PrintMatchInformation(String.format("%s, %s %s", match.getLeague().getSport().getName(), match.getLeague().getRegion().getName(), match.getLeague().getName()));
+        PrintMatchInformation(String.format("%s %s", match.getName(), convertToUTC(match.getKickoff())));
+        PrintMatchInformation(Long.toString(match.getId()));
+        Map<String, List<Market>> groupedMarkets = groupMatchesByMarketName(match);
+        PrintAllMatchRunners(groupedMarkets);
+
+    }
+
+    private static void PrintAllMatchRunners(Map<String, List<Market>> groupedMarkets) {
+        for (Map.Entry<String, List<Market>> entry : groupedMarkets.entrySet()) {
+            System.out.println(entry.getKey());
+            entry.getValue().forEach(Market::getFormatedTable);
+            System.out.println();
+        }
+    }
+
+    private static Map<String, List<Market>> groupMatchesByMarketName(Match match) {
+        return match.getMarkets().stream().collect(Collectors.groupingBy(Market::getName));
+    }
+
+    private static void PrintMatchInformation(String match) {
+        System.out.println(match);
     }
 
     private static String convertToUTC(long timestampMillis) {
